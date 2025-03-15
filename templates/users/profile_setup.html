@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Complete Your Profile - CareerCompass{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-12">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="bg-white shadow sm:rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <h3 class="text-lg leading-6 font-medium text-gray-900">
+                    Complete Your Profile
+                </h3>
+                <div class="mt-2 max-w-xl text-sm text-gray-500">
+                    <p>Please provide additional information to help us personalize your experience.</p>
+                </div>
+
+                <form method="post" enctype="multipart/form-data" class="mt-5 space-y-8">
+                    {% csrf_token %}
+                    
+                    <!-- Profile Information -->
+                    <div>
+                        <h4 class="text-md font-medium text-gray-900">Basic Information</h4>
+                        <div class="mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
+                            {{ profile_form|crispy }}
+                        </div>
+                    </div>
+
+                    <div class="border-t border-gray-200 pt-8">
+                        <h4 class="text-md font-medium text-gray-900">
+                            {% if user.user_type == 'student' %}
+                                Student Information
+                            {% elif user.user_type == 'professional' %}
+                                Professional Information
+                            {% elif user.user_type == 'mentor' %}
+                                Mentor Information
+                            {% else %}
+                                Company Information
+                            {% endif %}
+                        </h4>
+                        <div class="mt-4 grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-4">
+                            {{ specific_form|crispy }}
+                        </div>
+                    </div>
+
+                    <div class="pt-5">
+                        <div class="flex justify-end">
+                            <button type="button" onclick="window.history.back()" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                Cancel
+                            </button>
+                            <button type="submit" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                Save Profile
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    // Handle file input styling
+    document.querySelectorAll('input[type="file"]').forEach(function(input) {
+        input.addEventListener('change', function(e) {
+            const fileName = e.target.files[0]?.name;
+            const label = input.parentElement.querySelector('label');
+            if (label) {
+                label.textContent = fileName || 'Choose file';
+            }
+        });
+    });
+
+    // Handle JSON field formatting
+    document.querySelectorAll('textarea[name$="skills"], textarea[name$="interests"], textarea[name$="education"], textarea[name$="experience"], textarea[name$="certifications"], textarea[name$="social_links"]').forEach(function(textarea) {
+        textarea.placeholder = 'Enter as JSON array or comma-separated values';
+    });
+</script>
+{% endblock %}
+{% endblock %} 

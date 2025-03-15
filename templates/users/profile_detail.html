@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ profile_user.get_full_name|default:profile_user.username }}'s Profile - CareerCompass{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-100">
+    <!-- Cover Image -->
+    <div class="h-48 w-full bg-indigo-600 relative">
+        {% if profile_user.profile.cover_image %}
+            <img src="{{ profile_user.profile.cover_image.url }}" alt="Cover" class="w-full h-full object-cover">
+        {% endif %}
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="relative">
+            <!-- Profile Header -->
+            <div class="-mt-16 sm:-mt-24 sm:flex sm:items-end sm:space-x-5">
+                <div class="relative h-32 w-32 rounded-full ring-4 ring-white bg-white sm:h-48 sm:w-48">
+                    {% if profile_user.profile.avatar %}
+                        <img src="{{ profile_user.profile.avatar.url }}" alt="Profile" class="h-full w-full rounded-full object-cover">
+                    {% else %}
+                        <div class="h-full w-full rounded-full bg-gray-200 flex items-center justify-center">
+                            <span class="text-4xl text-gray-500">{{ profile_user.get_full_name|default:profile_user.username|make_list|first|upper }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="mt-6 sm:flex-1 sm:min-w-0 sm:flex sm:items-center sm:justify-end sm:space-x-6 sm:pb-1">
+                    <div class="sm:hidden md:block mt-6 min-w-0 flex-1">
+                        <h1 class="text-2xl font-bold text-gray-900 truncate">
+                            {{ profile_user.get_full_name|default:profile_user.username }}
+                        </h1>
+                        <p class="text-sm font-medium text-gray-500">
+                            {{ profile_user.profile.headline }}
+                        </p>
+                    </div>
+                    {% if user == profile_user %}
+                    <div class="mt-6 flex flex-col justify-stretch space-y-3 sm:flex-row sm:space-y-0 sm:space-x-4">
+                        <a href="{% url 'users:profile_edit' %}" class="inline-flex justify-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <svg class="-ml-1 mr-2 h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                            <span>Edit Profile</span>
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Profile Content -->
+            <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
+                <!-- Left Column -->
+                <div class="space-y-6 lg:col-span-2">
+                    <!-- About -->
+                    <div class="bg-white shadow sm:rounded-lg">
+                        <div class="px-4 py-5 sm:px-6">
+                            <h2 class="text-lg font-medium text-gray-900">About</h2>
+                            <p class="mt-1 text-sm text-gray-500">
+                                {{ profile_user.bio|default:"No bio provided." }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Experience -->
+                    <div class="bg-white shadow sm:rounded-lg">
+                        <div class="px-4 py-5 sm:px-6">
+                            <h2 class="text-lg font-medium text-gray-900">Experience</h2>
+                            <div class="mt-4 space-y-4">
+                                {% for exp in profile_user.profile.experience %}
+                                <div class="border-t border-gray-200 pt-4">
+                                    <div class="flex justify-between">
+                                        <div>
+                                            <h3 class="text-base font-semibold text-gray-900">{{ exp.title }}</h3>
+                                            <p class="text-sm text-gray-500">{{ exp.company }}</p>
+                                        </div>
+                                        <p class="text-sm text-gray-500">{{ exp.duration }}</p>
+                                    </div>
+                                    <p class="mt-2 text-sm text-gray-500">{{ exp.description }}</p>
+                                </div>
+                                {% empty %}
+                                <p class="text-sm text-gray-500">No experience listed.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Education -->
+                    <div class="bg-white shadow sm:rounded-lg">
+                        <div class="px-4 py-5 sm:px-6">
+                            <h2 class="text-lg font-medium text-gray-900">Education</h2>
+                            <div class="mt-4 space-y-4">
+                                {% for edu in profile_user.profile.education %}
+                                <div class="border-t border-gray-200 pt-4">
+                                    <div class="flex justify-between">
+                                        <div>
+                                            <h3 class="text-base font-semibold text-gray-900">{{ edu.degree }}</h3>
+                                            <p class="text-sm text-gray-500">{{ edu.institution }}</p>
+                                        </div>
+                                        <p class="text-sm text-gray-500">{{ edu.year }}</p>
+                                    </div>
+                                </div>
+                                {% empty %}
+                                <p class="text-sm text-gray-500">No education listed.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="space-y-6">
+                    <!-- Skills -->
+                    <div class="bg-white shadow sm:rounded-lg">
+                        <div class="px-4 py-5 sm:px-6">
+                            <h2 class="text-lg font-medium text-gray-900">Skills</h2>
+                            <div class="mt-4">
+                                {% for skill in profile_user.profile.skills %}
+                                <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800 mr-2 mb-2">
+                                    {{ skill }}
+                                </span>
+                                {% empty %}
+                                <p class="text-sm text-gray-500">No skills listed.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Certifications -->
+                    <div class="bg-white shadow sm:rounded-lg">
+                        <div class="px-4 py-5 sm:px-6">
+                            <h2 class="text-lg font-medium text-gray-900">Certifications</h2>
+                            <div class="mt-4 space-y-4">
+                                {% for cert in profile_user.profile.certifications %}
+                                <div class="border-t border-gray-200 pt-4">
+                                    <h3 class="text-base font-semibold text-gray-900">{{ cert.name }}</h3>
+                                    <p class="text-sm text-gray-500">{{ cert.issuer }} - {{ cert.year }}</p>
+                                </div>
+                                {% empty %}
+                                <p class="text-sm text-gray-500">No certifications listed.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Social Links -->
+                    <div class="bg-white shadow sm:rounded-lg">
+                        <div class="px-4 py-5 sm:px-6">
+                            <h2 class="text-lg font-medium text-gray-900">Connect</h2>
+                            <div class="mt-4 space-y-4">
+                                {% for platform, url in profile_user.profile.social_links.items %}
+                                <a href="{{ url }}" target="_blank" rel="noopener noreferrer" class="text-sm text-indigo-600 hover:text-indigo-900 block">
+                                    {{ platform|title }}
+                                </a>
+                                {% empty %}
+                                <p class="text-sm text-gray-500">No social links provided.</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
